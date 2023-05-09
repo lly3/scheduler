@@ -9,15 +9,15 @@ X3xffFxfX198X3wgICAK"
 echo
 
 PS3="Select operation: "
+current_record=""
 
-curl --fail http://localhost:3000/record/latest
+recordId=`curl --fail http://localhost:3000/record/latest`
 if [ $? -eq 0 ]
 then
 	current_record=$recordId
 else
 	echo -e "Initialize record [1] to start using the application"
 fi
-current_record=""
 
 select opt in init_record new_schedule new_record switch get_current_schedule quit; do
 	clear
