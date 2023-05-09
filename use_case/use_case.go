@@ -19,6 +19,7 @@ type RecordRepository interface {
 type ScheduleRepository interface {
 	GetScheduleById(scheduleId string) (entities.Schedule, error)
 	GetAllSchedule() ([]entities.Schedule, error)
+	Insert(schedule entities.Schedule) error
 }
 
 func isSwitchToExistInTodos(todos []entities.ScheduleItem, switchTo string) bool {

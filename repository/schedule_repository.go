@@ -58,6 +58,20 @@ func (s ScheduleRepo) GetAllSchedule() ([]entities.Schedule, error) {
 	return schedule, nil
 }
 
+func (s ScheduleRepo) Insert(schedule entities.Schedule) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	var scheduleDoc ScheduleDoc
+	scheduleDoc = scheduleToScheduleDoc(schedule)
+	_, err := s.Col.InsertOne(ctx, scheduleDoc)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func scheduleDocToSchedule(scheduleDoc ScheduleDoc) entities.Schedule {
 	var scheduleItems []entities.ScheduleItem
 	for _, item := range scheduleDoc.Todos {
@@ -70,5 +84,21 @@ func scheduleDocToSchedule(scheduleDoc ScheduleDoc) entities.Schedule {
 	return entities.Schedule{
 		Id: scheduleDoc.Id,
 		Todos: scheduleItems,
+	}
+}
+
+func scheduleToScheduleDoc (schedule entities.Schedule) ScheduleDoc {
+	var items []ScheduleItemDoc
+
+	for _, item := range schedule.Todos {
+		items = append(items, ScheduleItemDoc{
+			Title: item.Title,
+			Duration: item.Duration,
+		})
+	}
+
+	return ScheduleDoc{
+		Id: schedule.Id,
+		Todos: items,
 	}
 }

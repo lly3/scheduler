@@ -1,6 +1,19 @@
 package fiber
 
-import "github.com/gofiber/fiber/v2"
+import (
+	usecase "scheduler/use_case"
+
+	"github.com/gofiber/fiber/v2"
+)
+
+type CreateScheduleRequest struct{
+	Todos []ScheduleItem `json:"todos"`
+}
+
+type ScheduleItem struct{
+	Title string `json:"title"`
+	Duration string `json:"duration"`
+}
 
 func (f *FiberServer) CreateScheduleRoutes() {
 	scheduleRoutes := f.Server.Group("/schedule")
@@ -27,10 +40,40 @@ func (f *FiberServer) CreateScheduleRoutes() {
 		scheduleId := c.Params("id")
 		res, err := f.Uc.GetScheduleById(scheduleId)
 		if err != nil {
-			return err
+			return c.Status(fiber.StatusBadRequest).SendString(err.Error())
 		}
 
 		c.Status(fiber.StatusOK).SendString(res.String())
 		return nil
 	})
+
+	scheduleRoutes.Post("/", func(c *fiber.Ctx) error {
+		var request CreateScheduleRequest
+		if err := c.BodyParser(&request); err != nil {
+			return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+		}
+		
+		scheduleBody := toScheduleBody(request)
+		scheduleId, err := f.Uc.CreateSchedule(scheduleBody)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+		}
+		c.Status(fiber.StatusOK).SendString(scheduleId)
+		return nil
+	})
+}
+
+func toScheduleBody(req CreateScheduleRequest) usecase.ScheduleBody {
+	var scheduleBodyItems []usecase.ScheduleBodyItem
+
+	for _,v := range req.Todos {
+		scheduleBodyItems = append(scheduleBodyItems, usecase.ScheduleBodyItem {
+			Title: v.Title,
+			Duration: v.Duration,
+		})
+	}
+
+	return usecase.ScheduleBody {
+		Todos: scheduleBodyItems,
+	}
 }

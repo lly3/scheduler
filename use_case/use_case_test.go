@@ -57,6 +57,11 @@ func (s mockScheduleRepo) GetAllSchedule() ([]entities.Schedule, error) {
 	return schedule, nil
 }
 
+func (s mockScheduleRepo) Insert(sc entities.Schedule) error {
+	schedule = append(schedule, sc)
+	return nil
+}
+
 func (r mockRecordRepo) GetRecordById(recordId string) (entities.Record, error) {
 	for _, r := range records {
 		if r.Id == recordId {
