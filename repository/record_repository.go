@@ -2,11 +2,13 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"scheduler/entities"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type RecordDoc struct {
@@ -36,6 +38,30 @@ func (r RecordRepo) GetRecordById(recordId string) (entities.Record, error) {
 	}
 
 	return recordDocToRecord(recordDoc), nil
+}
+
+func (r RecordRepo) GetLatestRecordId() (string, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	opt := options.Find()
+	opt.SetSort(bson.D{{"$natural", -1}})
+	opt.SetLimit(1)
+	cur, err := r.Col.Find(ctx, bson.D{}, opt)
+	if err != nil {
+		return "", err
+	}
+
+	var recordDoc []RecordDoc
+	if err := cur.All(context.Background(), &recordDoc); err != nil {
+		return "", err
+	}
+
+	if len(recordDoc) == 0 {
+		return "", errors.New("There are no records yet")
+	}
+
+	return recordDoc[0].Id, nil
 }
 
 func (r RecordRepo) Insert(record entities.Record) error {

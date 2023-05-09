@@ -12,6 +12,7 @@ type UseCase struct {
 
 type RecordRepository interface {
 	GetRecordById(recordId string) (entities.Record, error)
+	GetLatestRecordId() (string, error)
 	Insert(record entities.Record) error
 	Update(record entities.Record) error
 }

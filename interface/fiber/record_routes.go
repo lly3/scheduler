@@ -53,4 +53,14 @@ func (f *FiberServer) CreateRecordRoutes() {
 		c.Status(fiber.StatusOK).SendString(res.String())
 		return nil
 	})
+
+	recordRoutes.Get("/latest", func(c *fiber.Ctx) error {
+
+		res, err := f.Uc.GetLatestRecordId()
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+		}
+		c.Status(fiber.StatusOK).SendString(res)
+		return nil
+	})
 }

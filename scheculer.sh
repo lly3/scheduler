@@ -1,8 +1,5 @@
 #!/bin/bash
 
-PS3="Select operation: "
-current_record=""
-
 base64 -d <<<"ICAgX19fX18gICAgICBfICAgICAgICAgICAgICBfICAgICAgIF8gICAgICAgICAgIAogIC8gX19f
 X3wgICAgfCB8ICAgICAgICAgICAgfCB8ICAgICB8IHwgICAgICAgICAgCiB8IChfX18gICBfX198
 IHxfXyAgIF9fXyAgX198IHxfICAgX3wgfCBfX18gXyBfXyAKICBcX19fIFwgLyBfX3wgJ18gXCAv
@@ -11,7 +8,18 @@ fCB8IHxffCB8IHwgIF9fLyB8ICAgCiB8X19fX18vIFxfX198X3wgfF98XF9fX3xcX18sX3xcX18s
 X3xffFxfX198X3wgICAK"
 echo
 
-select opt in init_record load_record new_record switch get_current_schedule quit; do
+PS3="Select operation: "
+
+curl --fail http://localhost:3000/record/latest
+if [ $? -eq 0 ]
+then
+	current_record=$recordId
+else
+	echo -e "Initialize record [1] to start using the application"
+fi
+current_record=""
+
+select opt in init_record new_schedule new_record switch get_current_schedule quit; do
 	clear
 	base64 -d <<<"ICAgX19fX18gICAgICBfICAgICAgICAgICAgICBfICAgICAgIF8gICAgICAgICAgIAogIC8gX19f
 X3wgICAgfCB8ICAgICAgICAgICAgfCB8ICAgICB8IHwgICAgICAgICAgCiB8IChfX18gICBfX198
@@ -22,7 +30,7 @@ X3xffFxfX198X3wgICAK"
 	echo
 	cat<<EOF
 1) init_record           3) new_record            5) get_current_schedule
-2) load_record           4) switch                6) quit
+2) new_schedule          4) switch                6) quit
 EOF
 	case $opt in
 		init_record)
@@ -40,16 +48,38 @@ EOF
 				current_record=$recordId
 			fi
 			;;
-		load_record)
-			read -p "Enter record id: " recordId
-			curl --fail http://localhost:3000/record/remain/$recordId
-			if [ $? -eq 0 ]; then
-				current_record=$recordId
-			fi
+		new_schedule)
+			todos=""
+
+			while [ 0 ] 
+			do
+				read -p "Enter your todo: " title
+				read -p "Enter your duration(10ms,1m,1h): " duration
+
+				todos+="{"
+				todos+="\"title\":\"$title\""
+				todos+=","
+				todos+="\"duration\":\"$duration\""
+				todos+="}"
+
+				read -p "Are you done?(y/n): " ex
+				if [ $ex == "y" ]; then
+					break
+				fi
+
+				todos+=","
+			done
+
+			echo $todos
+
+			curl -H 'content-type: application/json' \
+				-d "{ \"todos\": [$todos] }" \
+				-X POST \
+				http://localhost:3000/schedule
 			;;
 		new_record)
 			if [ -z $current_record ]; then
-				echo "You need to initize record first [1](or load the record [2])"
+				echo "You need to initialize record first [1]"
 				continue
 			fi
 
@@ -69,7 +99,7 @@ EOF
 			;;
 		switch)
 			if [ -z $current_record ]; then
-				echo "You need to initize record first [1](or load the record [2])"
+				echo "You need to initialize record first [1]"
 				continue
 			fi
 
@@ -82,7 +112,7 @@ EOF
 			;;
 		get_current_schedule)
 			if [ -z $current_record ]; then
-				echo "You need to initize record first [1](or load the record [2])"
+				echo "You need to initialize record first [1]"
 				continue
 			fi
 			
