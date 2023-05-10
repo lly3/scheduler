@@ -25,6 +25,7 @@ func (uc *UseCase) CreateRecord(prevRecord string, scheduleId string, nowDoing s
 			return "", err
 		}
 		record.Items[len(record.Items)-1].End = time.Now()
+		uc.RecordRepo.Update(record)
 	}
 
 	newRecord := entities.Record{

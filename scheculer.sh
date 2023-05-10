@@ -20,18 +20,6 @@ else
 fi
 
 select opt in init_record new_schedule new_record switch get_current_schedule quit; do
-	clear
-	base64 -d <<<"ICAgX19fX18gICAgICBfICAgICAgICAgICAgICBfICAgICAgIF8gICAgICAgICAgIAogIC8gX19f
-X3wgICAgfCB8ICAgICAgICAgICAgfCB8ICAgICB8IHwgICAgICAgICAgCiB8IChfX18gICBfX198
-IHxfXyAgIF9fXyAgX198IHxfICAgX3wgfCBfX18gXyBfXyAKICBcX19fIFwgLyBfX3wgJ18gXCAv
-IF8gXC8gX2AgfCB8IHwgfCB8LyBfIFwgJ19ffAogIF9fX18pIHwgKF9ffCB8IHwgfCAgX18vIChf
-fCB8IHxffCB8IHwgIF9fLyB8ICAgCiB8X19fX18vIFxfX198X3wgfF98XF9fX3xcX18sX3xcX18s
-X3xffFxfX198X3wgICAK"
-	echo
-	cat<<EOF
-1) init_record           3) new_record            5) get_current_schedule
-2) new_schedule          4) switch                6) quit
-EOF
 	case $opt in
 		init_record)
 			curl http://localhost:3000/schedule
