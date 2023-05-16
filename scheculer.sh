@@ -20,6 +20,7 @@ else
 fi
 
 select opt in init_record new_schedule new_record switch get_current_schedule quit; do
+	clear
 	case $opt in
 		init_record)
 			curl http://localhost:3000/schedule
@@ -39,7 +40,7 @@ select opt in init_record new_schedule new_record switch get_current_schedule qu
 		new_schedule)
 			todos=""
 
-			while [ 0 ] 
+			while true
 			do
 				read -p "Enter your todo: " title
 				read -p "Enter your duration(10ms,1m,1h): " duration
