@@ -10,8 +10,9 @@ echo
 
 PS3="Select operation: "
 current_record=""
+url="http://localhost:3000"
 
-recordId=`curl --fail http://localhost:3000/record/latest`
+recordId=`curl --fail $url/record/latest`
 if [ $? -eq 0 ]
 then
 	current_record=$recordId
@@ -23,7 +24,7 @@ select opt in init_record new_schedule new_record switch get_current_schedule qu
 	clear
 	case $opt in
 		init_record)
-			curl http://localhost:3000/schedule
+			curl $url/schedule
 
 			read -p "enter schedule id: " scheduleId
 			read -p "what you currently doing?: " nowDoing
@@ -31,7 +32,7 @@ select opt in init_record new_schedule new_record switch get_current_schedule qu
 			recordId=`curl -H 'content-type: application/json' \
 				-d "{ \"schedule_id\": \"$scheduleId\", \"now_doing\": \"$nowDoing\" }" \
 				-X POST \
-				--fail http://localhost:3000/record/init-record`
+				--fail $url/record/init-record`
 
 			if [ $? -eq 0 ]; then
 				current_record=$recordId
@@ -64,7 +65,7 @@ select opt in init_record new_schedule new_record switch get_current_schedule qu
 			curl -H 'content-type: application/json' \
 				-d "{ \"todos\": [$todos] }" \
 				-X POST \
-				http://localhost:3000/schedule
+				$url/schedule
 			;;
 		new_record)
 			if [ -z $current_record ]; then
@@ -72,7 +73,7 @@ select opt in init_record new_schedule new_record switch get_current_schedule qu
 				continue
 			fi
 
-			curl http://localhost:3000/schedule
+			curl $url/schedule
 
 			read -p "enter schedule id: " scheduleId
 			read -p "what you currently doing?: " nowDoing
@@ -80,7 +81,7 @@ select opt in init_record new_schedule new_record switch get_current_schedule qu
 			recordId=`curl -H 'content-type: application/json' \
 				-d "{ \"schedule_id\": \"$scheduleId\", \"now_doing\": \"$nowDoing\" }" \
 				-X POST \
-				--fail http://localhost:3000/record/$current_record`
+				--fail $url/record/$current_record`
 
 			if [ $? -eq 0 ]; then
 				current_record=$recordId
@@ -97,7 +98,7 @@ select opt in init_record new_schedule new_record switch get_current_schedule qu
 			curl -H 'content-type: application/json' \
 				-d "{ \"record_id\": \"$current_record\", \"switch_to\": \"$nowDoing\" }" \
 				-X POST \
-				--fail http://localhost:3000/record/switch
+				--fail $url/record/switch
 			;;
 		get_current_schedule)
 			if [ -z $current_record ]; then
@@ -105,7 +106,7 @@ select opt in init_record new_schedule new_record switch get_current_schedule qu
 				continue
 			fi
 			
-			curl --fail http://localhost:3000/record/remain/$current_record
+			curl --fail $url/record/remain/$current_record
 			;;
 		quit)
 			break
