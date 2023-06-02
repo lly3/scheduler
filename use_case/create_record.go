@@ -19,7 +19,7 @@ func (uc *UseCase) CreateRecord(prevRecord string, scheduleId string, nowDoing s
 		return "", err
 	}
 	
-	if prevRecord != "init-record" {
+	if prevRecord != "" {
 		record, err := uc.RecordRepo.GetRecordById(prevRecord)
 		if err != nil {
 			return "", err

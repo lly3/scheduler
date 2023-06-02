@@ -3,6 +3,7 @@ package fiber
 import "github.com/gofiber/fiber/v2"
 
 type CreateRecordRequest struct{
+	PrevRecordId string `json:"prev_record_id"`
 	ScheduleId string `json:"schedule_id"`
 	NowDoing string `json:"now_doing"`
 }
@@ -29,13 +30,12 @@ func (f *FiberServer) CreateRecordRoutes() {
 	})
 
 
-	recordRoutes.Post("/:prev_rec", func(c *fiber.Ctx) error {
-		prevRecordId := c.Params("prev_rec")
+	recordRoutes.Post("/", func(c *fiber.Ctx) error {
 		request := CreateRecordRequest{}
 
 		c.BodyParser(&request)
 
-		res, err := f.Uc.CreateRecord(prevRecordId, request.ScheduleId, request.NowDoing)
+		res, err := f.Uc.CreateRecord(request.PrevRecordId, request.ScheduleId, request.NowDoing)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).SendString(err.Error())
 		}

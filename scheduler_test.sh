@@ -10,31 +10,31 @@ echo
 
 PS3="Select operation: "
 current_record=""
-url="https://celestial11.thddns.net:8888/scheduler"
-user="melon:dSX5gajX2TiZvzLmrrAPx4o/rlBmvrUkdTOG2P8UPA+NwCHR5XRrIea0O1EAxYgs"
-curl="curl --user "$user" -k"
+url="http://localhost:3000"
+user=""
+curl="curl -k"
 
 recordId=`$curl --fail $url/record/latest`
 if [ $? -eq 0 ]
 then
 	current_record=$recordId
 else
-	echo -e "Initialize record [1] to start using the application"
+	echo -e "Create record [1] to start using the application"
 fi
 
-select opt in init_record new_schedule new_record switch get_current_schedule quit; do
+select opt in new_record new_schedule switch get_current_schedule quit; do
 	clear
 	case $opt in
-		init_record)
+		new_record)
 			$curl $url/schedule
 
 			read -p "enter schedule id: " scheduleId
 			read -p "what you currently doing?: " nowDoing
 			
 			recordId=`$curl -H 'content-type: application/json' \
-				-d "{ \"schedule_id\": \"$scheduleId\", \"now_doing\": \"$nowDoing\" }" \
+				-d "{ \"prev_record_id\": \"$current_record\", \"schedule_id\": \"$scheduleId\", \"now_doing\": \"$nowDoing\" }" \
 				-X POST \
-				--fail $url/record/init-record`
+				--fail $url/record/`
 
 			if [ $? -eq 0 ]; then
 				current_record=$recordId
@@ -69,32 +69,7 @@ select opt in init_record new_schedule new_record switch get_current_schedule qu
 				-X POST \
 				$url/schedule
 			;;
-		new_record)
-			if [ -z $current_record ]; then
-				echo "You need to initialize record first [1]"
-				continue
-			fi
-
-			$curl $url/schedule
-
-			read -p "enter schedule id: " scheduleId
-			read -p "what you currently doing?: " nowDoing
-			
-			recordId=`$curl -H 'content-type: application/json' \
-				-d "{ \"schedule_id\": \"$scheduleId\", \"now_doing\": \"$nowDoing\" }" \
-				-X POST \
-				--fail $url/record/$current_record`
-
-			if [ $? -eq 0 ]; then
-				current_record=$recordId
-			fi
-			;;
 		switch)
-			if [ -z $current_record ]; then
-				echo "You need to initialize record first [1]"
-				continue
-			fi
-
 			read -p "what you currently doing?: " nowDoing
 
 			$curl -H 'content-type: application/json' \
@@ -103,11 +78,6 @@ select opt in init_record new_schedule new_record switch get_current_schedule qu
 				--fail $url/record/switch
 			;;
 		get_current_schedule)
-			if [ -z $current_record ]; then
-				echo "You need to initialize record first [1]"
-				continue
-			fi
-			
 			$curl --fail $url/record/remain/$current_record
 			;;
 		quit)
