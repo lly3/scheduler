@@ -6,9 +6,9 @@ import (
 	"time"
 )
 
-func (uc *UseCase) Switching(recordId string, switchTo string) error {
+func (uc *UseCase) Switching(switchTo string) error {
 
-	record, err := uc.RecordRepo.GetRecordById(recordId)
+	record, err := uc.RecordRepo.GetLatestRecord();
 	if(err != nil) {
 		return err
 	}

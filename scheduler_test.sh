@@ -9,18 +9,9 @@ X3xffFxfX198X3wgICAK"
 echo
 
 PS3="Select operation: "
-current_record=""
 url="http://localhost:3000"
 user=""
 curl="curl -k"
-
-recordId=`$curl --fail $url/record/latest`
-if [ $? -eq 0 ]
-then
-	current_record=$recordId
-else
-	echo -e "Create record [1] to start using the application"
-fi
 
 select opt in new_record new_schedule switch get_current_schedule quit; do
 	clear
@@ -31,14 +22,10 @@ select opt in new_record new_schedule switch get_current_schedule quit; do
 			read -p "enter schedule id: " scheduleId
 			read -p "what you currently doing?: " nowDoing
 			
-			recordId=`$curl -H 'content-type: application/json' \
-				-d "{ \"prev_record_id\": \"$current_record\", \"schedule_id\": \"$scheduleId\", \"now_doing\": \"$nowDoing\" }" \
+			$curl -H 'content-type: application/json' \
+				-d "{ \"schedule_id\": \"$scheduleId\", \"now_doing\": \"$nowDoing\" }" \
 				-X POST \
-				--fail $url/record/`
-
-			if [ $? -eq 0 ]; then
-				current_record=$recordId
-			fi
+				--fail $url/record/
 			;;
 		new_schedule)
 			todos=""
@@ -73,12 +60,12 @@ select opt in new_record new_schedule switch get_current_schedule quit; do
 			read -p "what you currently doing?: " nowDoing
 
 			$curl -H 'content-type: application/json' \
-				-d "{ \"record_id\": \"$current_record\", \"switch_to\": \"$nowDoing\" }" \
+				-d "{ \"switch_to\": \"$nowDoing\" }" \
 				-X POST \
 				--fail $url/record/switch
 			;;
 		get_current_schedule)
-			$curl --fail $url/record/remain/$current_record
+			$curl --fail $url/record/remain
 			;;
 		quit)
 			break

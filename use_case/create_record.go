@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func (uc *UseCase) CreateRecord(prevRecord string, scheduleId string, nowDoing string) (string, error) {
+func (uc *UseCase) CreateRecord(scheduleId string, nowDoing string) (string, error) {
 
 	// check, is scheduleId exist?
 	if _, err := uc.ScheduleRepo.GetScheduleById(scheduleId); err != nil {
@@ -18,12 +18,11 @@ func (uc *UseCase) CreateRecord(prevRecord string, scheduleId string, nowDoing s
 	if(err != nil) {
 		return "", err
 	}
-	
-	if prevRecord != "" {
-		record, err := uc.RecordRepo.GetRecordById(prevRecord)
-		if err != nil {
-			return "", err
-		}
+
+	// check, is latest record exist?
+	if record, err := uc.RecordRepo.GetLatestRecord(); err != nil {
+		return "", err
+	} else {
 		record.Items[len(record.Items)-1].End = time.Now()
 		uc.RecordRepo.Update(record)
 	}

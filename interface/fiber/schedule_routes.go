@@ -38,12 +38,12 @@ func (f *FiberServer) CreateScheduleRoutes() {
 
 	scheduleRoutes.Get("/:id", func(c *fiber.Ctx) error {
 		scheduleId := c.Params("id")
-		res, err := f.Uc.GetScheduleById(scheduleId)
+		schedule, err := f.Uc.GetScheduleById(scheduleId)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).SendString(err.Error())
 		}
 
-		c.Status(fiber.StatusOK).SendString(res.String())
+		c.Status(fiber.StatusOK).SendString(schedule.String())
 		return nil
 	})
 

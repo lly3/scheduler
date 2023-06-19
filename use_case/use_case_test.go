@@ -71,6 +71,14 @@ func (r mockRecordRepo) GetRecordById(recordId string) (entities.Record, error) 
 	return entities.Record{}, errors.New("Can't find recordId: " + recordId)
 }
 
+func (r mockRecordRepo) GetLatestRecordId() (string, error) {
+	return records[len(records)-1].Id, nil;
+}
+
+func (r mockRecordRepo) GetLatestRecord() (entities.Record, error) {
+	return records[len(records)-1], nil;
+}
+
 func (r mockRecordRepo) Insert(record entities.Record) error {
 	records = append(records, record)
 	return nil

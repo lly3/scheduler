@@ -13,6 +13,7 @@ type UseCase struct {
 type RecordRepository interface {
 	GetRecordById(recordId string) (entities.Record, error)
 	GetLatestRecordId() (string, error)
+	GetLatestRecord() (entities.Record, error)
 	Insert(record entities.Record) error
 	Update(record entities.Record) error
 }
@@ -40,7 +41,7 @@ func calculateRemainingTime(schedule entities.Schedule, record entities.Record) 
 		for i, item := range record.Items {
 			if(todo.Title == item.Title) {
 				var duration time.Duration
-				if i == len(record.Items)-1 {
+				if i == len(record.Items)-1 && record.Items[len(record.Items)-1].End.IsZero() {
 					duration = time.Now().Sub(item.Start)
 				} else {
 					duration = item.End.Sub(item.Start)

@@ -64,6 +64,32 @@ func (r RecordRepo) GetLatestRecordId() (string, error) {
 	return recordDoc[0].Id, nil
 }
 
+func (r RecordRepo) GetLatestRecord() (entities.Record, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	opt := options.Find()
+	opt.SetSort(bson.D{{"$natural", -1}})
+	opt.SetLimit(1)
+	cur, err := r.Col.Find(ctx, bson.D{}, opt)
+	if err != nil {
+		return entities.Record{}, err
+	}
+
+	var recordDoc []RecordDoc
+	if err := cur.All(context.Background(), &recordDoc); err != nil {
+		return entities.Record{}, err
+	}
+
+	if len(recordDoc) == 0 {
+		return entities.Record{}, errors.New("There are no records yet")
+	}
+
+	record := recordDocToRecord(recordDoc[0]);
+
+	return record, nil
+}
+
 func (r RecordRepo) Insert(record entities.Record) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()

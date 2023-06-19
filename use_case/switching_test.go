@@ -10,7 +10,6 @@ func TestSwitching(t *testing.T) {
 		newMockRecordRepo(),
 	}
 	type args struct {
-		recordId string
 		switchTo string
 	}
 	tests := []struct {
@@ -20,26 +19,20 @@ func TestSwitching(t *testing.T) {
 		wantErr bool
 	} {
 		{
-			name: "test switching with correct recordId",
-			args: args{"0", "Gaming"},
+			name: "test switching",
+			args: args{"Gaming"},
 			want: true,
 			wantErr: false,
 		},
 		{
-			name: "test switching with correct recordId and correct todo",
-			args: args{"0", "Relax"},
+			name: "test switching with correct todo",
+			args: args{"Relax"},
 			want: true,
 			wantErr: false,
 		},
 		{
-			name: "test switching with incorrect recordId",
-			args: args{"1", "Gaming"},
-			want: false,
-			wantErr: true,
-		},
-		{
-			name: "test switching with correct recordId and incorrect todo",
-			args: args{"0", "Cooking"},
+			name: "test switching with incorrect todo",
+			args: args{"Cooking"},
 			want: false,
 			wantErr: true,
 		},
@@ -47,9 +40,9 @@ func TestSwitching(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			err := uc.Switching(tt.args.recordId, tt.args.switchTo)
+			err := uc.Switching(tt.args.switchTo)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("GetSchedule() error = %v, wantErr = %v", err, tt.wantErr)
+				t.Errorf("Switching() error = %v, wantErr = %v", err, tt.wantErr)
 				return
 			}
 		})

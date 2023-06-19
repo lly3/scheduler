@@ -1,22 +1,12 @@
 package usecase
 
-import (
-	"scheduler/entities"
-)
+import "scheduler/entities"
 
-func (uc *UseCase) GetSchedule(recordId string) (entities.RemainSchedule, error) {
-
-	record, err := uc.RecordRepo.GetRecordById(recordId)
-	if(err != nil) {
-		return entities.RemainSchedule{}, err
+func (uc *UseCase) GetScheduleById(scheduleId string) (entities.Schedule, error) {
+	schedule, err := uc.ScheduleRepo.GetScheduleById(scheduleId)
+	if err != nil {
+		return entities.Schedule{}, err
 	}
 
-	schedule, err := uc.ScheduleRepo.GetScheduleById(record.ScheduleId)
-	if(err != nil) {
-		return entities.RemainSchedule{}, err
-	}
-	
-	remainSchedule := calculateRemainingTime(schedule, record)
-
-	return remainSchedule, nil
+	return schedule, nil
 }
