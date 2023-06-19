@@ -14,17 +14,18 @@ func (uc *UseCase) CreateRecord(scheduleId string, nowDoing string) (string, err
 		return "", err
 	}
 
-	recordId, err := utils.RandomHex(16)
-	if(err != nil) {
-		return "", err
+	recordId, rxerr := utils.RandomHex(16)
+	if(rxerr != nil) {
+		return "", rxerr
 	}
 
 	// check, is latest record exist?
-	if record, err := uc.RecordRepo.GetLatestRecord(); err != nil {
-		return "", err
-	} else {
+	record, glrerr := uc.RecordRepo.GetLatestRecord()
+	if glrerr == nil {
 		record.Items[len(record.Items)-1].End = time.Now()
-		uc.RecordRepo.Update(record)
+		if err := uc.RecordRepo.Update(record); err != nil {
+			return "", err
+		}
 	}
 
 	newRecord := entities.Record{
