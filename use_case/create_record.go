@@ -15,7 +15,7 @@ func (uc *UseCase) CreateRecord(scheduleId string, nowDoing string) (string, err
 	}
 
 	recordId, rxerr := utils.RandomHex(16)
-	if(rxerr != nil) {
+	if rxerr != nil {
 		return "", rxerr
 	}
 
@@ -29,25 +29,25 @@ func (uc *UseCase) CreateRecord(scheduleId string, nowDoing string) (string, err
 	}
 
 	newRecord := entities.Record{
-		Id: recordId,
+		Id:         recordId,
 		ScheduleId: scheduleId,
 		Items: []entities.RecordItem{
 			{
 				Title: nowDoing,
 				Start: time.Now(),
-				End: time.Time{},
+				End:   time.Time{},
 			},
 		},
 	}
 
 	schedule, err := uc.ScheduleRepo.GetScheduleById(newRecord.ScheduleId)
-	if(err != nil) {
+	if err != nil {
 		return "", err
 	}
 	if isExist := isSwitchToExistInTodos(schedule.Todos, nowDoing); !isExist {
 		return "", errors.New("This todo: '" + nowDoing + "' is not exist in schedule")
 	}
-	
+
 	if err := uc.RecordRepo.Insert(newRecord); err != nil {
 		return "", err
 	}

@@ -2,9 +2,9 @@ package fiber
 
 import "github.com/gofiber/fiber/v2"
 
-type CreateRecordRequest struct{
+type CreateRecordRequest struct {
 	ScheduleId string `json:"schedule_id"`
-	NowDoing string `json:"now_doing"`
+	NowDoing   string `json:"now_doing"`
 }
 
 type SwitchRecordRequest struct {
@@ -13,7 +13,6 @@ type SwitchRecordRequest struct {
 
 func (f *FiberServer) CreateRecordRoutes() {
 	recordRoutes := f.Server.Group("/record")
-
 
 	recordRoutes.Post("/", func(c *fiber.Ctx) error {
 		request := CreateRecordRequest{}
@@ -40,7 +39,6 @@ func (f *FiberServer) CreateRecordRoutes() {
 		c.Status(fiber.StatusOK)
 		return nil
 	})
-
 
 	recordRoutes.Get("/remain", func(c *fiber.Ctx) error {
 

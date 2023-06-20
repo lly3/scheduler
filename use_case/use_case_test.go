@@ -3,49 +3,15 @@ package usecase
 import (
 	"errors"
 	"scheduler/entities"
-	"time"
+	"testing"
 )
 
-var schedule = []entities.Schedule{
-	{
-		Id: "0",
-		Todos: []entities.ScheduleItem{
-			{
-				Title: "Relax",
-				Duration: time.Hour * 4,
-			},
-			{
-				Title: "Gaming",
-				Duration: time.Hour * 2,
-			},
-		},
-	},
+type mockScheduleRepo struct {
+	schedules []entities.Schedule
 }
 
-var records = []entities.Record{
-	{
-		Id: "0",
-		ScheduleId: "0",
-		Items: []entities.RecordItem{
-			{
-				Title: "Gaming",	
-				Start: time.Now(),
-				End: time.Now(),
-			},
-			{
-				Title: "Relax",	
-				Start: time.Now(),
-				End: time.Time{},
-			},
-		},
-	},
-}
-
-type mockScheduleRepo struct {}
-type mockRecordRepo struct {}
-
-func (s mockScheduleRepo) GetScheduleById(scheduleId string) (entities.Schedule, error) {
-	for _, s := range schedule {
+func (s *mockScheduleRepo) GetScheduleById(scheduleId string) (entities.Schedule, error) {
+	for _, s := range s.schedules {
 		if s.Id == scheduleId {
 			return s, nil
 		}
@@ -53,17 +19,21 @@ func (s mockScheduleRepo) GetScheduleById(scheduleId string) (entities.Schedule,
 	return entities.Schedule{}, errors.New("Can't find scheduleId: " + scheduleId)
 }
 
-func (s mockScheduleRepo) GetAllSchedule() ([]entities.Schedule, error) {
-	return schedule, nil
+func (s *mockScheduleRepo) GetAllSchedule() ([]entities.Schedule, error) {
+	return s.schedules, nil
 }
 
-func (s mockScheduleRepo) Insert(sc entities.Schedule) error {
-	schedule = append(schedule, sc)
+func (s *mockScheduleRepo) Insert(sc entities.Schedule) error {
+	s.schedules = append(s.schedules, sc)
 	return nil
 }
 
-func (r mockRecordRepo) GetRecordById(recordId string) (entities.Record, error) {
-	for _, r := range records {
+type mockRecordRepo struct {
+	records []entities.Record
+}
+
+func (r *mockRecordRepo) GetRecordById(recordId string) (entities.Record, error) {
+	for _, r := range r.records {
 		if r.Id == recordId {
 			return r, nil
 		}
@@ -71,26 +41,29 @@ func (r mockRecordRepo) GetRecordById(recordId string) (entities.Record, error) 
 	return entities.Record{}, errors.New("Can't find recordId: " + recordId)
 }
 
-func (r mockRecordRepo) GetLatestRecordId() (string, error) {
-	return records[len(records)-1].Id, nil;
+func (r *mockRecordRepo) GetLatestRecordId() (string, error) {
+	return r.records[len(r.records)-1].Id, nil
 }
 
-func (r mockRecordRepo) GetLatestRecord() (entities.Record, error) {
-	return records[len(records)-1], nil;
+func (r *mockRecordRepo) GetLatestRecord() (entities.Record, error) {
+	if len(r.records) == 0 {
+		return entities.Record{}, errors.New("There is no record yet")
+	}
+	return r.records[len(r.records)-1], nil
 }
 
-func (r mockRecordRepo) Insert(record entities.Record) error {
-	records = append(records, record)
+func (r *mockRecordRepo) Insert(record entities.Record) error {
+	r.records = append(r.records, record)
 	return nil
 }
 
-func (r mockRecordRepo) Update(record entities.Record) error {
-	for i, r := range records {
-		if r.Id == record.Id {
-			records = append(records[:i], records[i+1:]...)
+func (r *mockRecordRepo) Update(record entities.Record) error {
+	for i, rec := range r.records {
+		if rec.Id == record.Id {
+			r.records = append(r.records[:i], r.records[i+1:]...)
 		}
-	}	
-	records = append(records, record)
+	}
+	r.records = append(r.records, record)
 	return nil
 }
 
@@ -100,4 +73,10 @@ func newMockScheduleRepo() ScheduleRepository {
 
 func newMockRecordRepo() RecordRepository {
 	return &mockRecordRepo{}
+}
+
+func assertEqual(t *testing.T, a interface{}, b interface{}) {
+	if a != b {
+		t.Errorf("%v != %v", a, b)
+	}
 }
