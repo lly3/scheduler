@@ -1,13 +1,19 @@
 package usecase
 
 import (
+	"errors"
 	"scheduler/entities"
 	"time"
 )
 
+var (
+	ErrScheduleNotFound = errors.New("schedule not found")
+	ErrRecordNotFound   = errors.New("record not found")
+)
+
 type UseCase struct {
 	ScheduleRepo ScheduleRepository
-	RecordRepo RecordRepository
+	RecordRepo   RecordRepository
 }
 
 type RecordRepository interface {
@@ -26,7 +32,7 @@ type ScheduleRepository interface {
 
 func isSwitchToExistInTodos(todos []entities.ScheduleItem, switchTo string) bool {
 	for _, v := range todos {
-		if(v.Title == switchTo) {
+		if v.Title == switchTo {
 			return true
 		}
 	}
@@ -35,11 +41,11 @@ func isSwitchToExistInTodos(todos []entities.ScheduleItem, switchTo string) bool
 
 func calculateRemainingTime(schedule entities.Schedule, record entities.Record) entities.RemainSchedule {
 	remainSchedule := entities.RemainSchedule{}
-	
+
 	for _, todo := range schedule.Todos {
 		var total time.Duration
 		for i, item := range record.Items {
-			if(todo.Title == item.Title) {
+			if todo.Title == item.Title {
 				var duration time.Duration
 				if i == len(record.Items)-1 && record.Items[len(record.Items)-1].End.IsZero() {
 					duration = time.Now().Sub(item.Start)
@@ -51,11 +57,10 @@ func calculateRemainingTime(schedule entities.Schedule, record entities.Record) 
 		}
 
 		remainSchedule.RemainItems = append(remainSchedule.RemainItems, entities.RemainItem{
-			Title: todo.Title,
+			Title:  todo.Title,
 			Remain: todo.Duration - total,
 		})
 	}
 
 	return remainSchedule
 }
-

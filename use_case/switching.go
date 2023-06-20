@@ -8,14 +8,14 @@ import (
 
 func (uc *UseCase) Switching(switchTo string) error {
 
-	record, err := uc.RecordRepo.GetLatestRecord();
-	if(err != nil) {
+	record, err := uc.RecordRepo.GetLatestRecord()
+	if err != nil {
 		return err
 	}
 
 	schedule, err := uc.ScheduleRepo.GetScheduleById(record.ScheduleId)
-	if(err != nil) {
-		return err
+	if err != nil {
+		return ErrScheduleNotFound
 	}
 	if isExist := isSwitchToExistInTodos(schedule.Todos, switchTo); !isExist {
 		return errors.New("This todo: '" + switchTo + "' is not exist in schedule")
@@ -25,7 +25,7 @@ func (uc *UseCase) Switching(switchTo string) error {
 	record.Items = append(record.Items, entities.RecordItem{
 		Title: switchTo,
 		Start: time.Now(),
-		End: time.Time{},
+		End:   time.Time{},
 	})
 	if err := uc.RecordRepo.Update(record); err != nil {
 		return err
