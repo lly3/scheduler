@@ -13,7 +13,7 @@ url="http://localhost:3000"
 user=""
 curl="curl -k"
 
-select opt in new_record new_schedule switch get_current_schedule quit; do
+select opt in new_record new_schedule terminate switch get_current_schedule quit; do
 	clear
 	case $opt in
 		new_record)
@@ -55,6 +55,9 @@ select opt in new_record new_schedule switch get_current_schedule quit; do
 				-d "{ \"todos\": [$todos] }" \
 				-X POST \
 				$url/schedule
+			;;
+		terminate)
+			$curl $url/record/terminate
 			;;
 		switch)
 			read -p "what you currently doing?: " nowDoing
