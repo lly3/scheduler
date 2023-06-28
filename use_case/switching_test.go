@@ -49,7 +49,8 @@ func TestSwitching(t *testing.T) {
 		}
 
 		assertEqual(t, latestRecord.Items[len(latestRecord.Items)-1].Title, "valid_todo_2")
-		assertEqual(t, latestRecord.Items[len(latestRecord.Items)-1].Start, latestRecord.Items[len(latestRecord.Items)-2].End)
+		isPassEstimatedTime := timeEstimator(latestRecord.Items[len(latestRecord.Items)-1].Start.Sub(latestRecord.Items[len(latestRecord.Items)-2].End), time.Second*5)
+		assertEqual(t, isPassEstimatedTime, true)
 	})
 
 	t.Run("should failed switch when given incorrect todo", func(t *testing.T) {

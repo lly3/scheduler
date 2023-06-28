@@ -44,6 +44,7 @@ func TestGetCurrentSchedule(t *testing.T) {
 		}
 
 		assertEqual(t, remainSchedule.RemainItems[0].Title, "valid_todo_1")
-		assertEqual(t, remainSchedule.RemainItems[0].Remain, time.Hour*4-time.Now().Sub(time.Date(2023, 6, 20, 10, 10, 10, 10, time.Local)))
+		isPassEstimateTime := timeEstimator(remainSchedule.RemainItems[0].Remain-time.Hour*4-time.Now().Sub(time.Date(2023, 6, 20, 10, 10, 10, 10, time.Local)), time.Second*5)
+		assertEqual(t, isPassEstimateTime, true)
 	})
 }

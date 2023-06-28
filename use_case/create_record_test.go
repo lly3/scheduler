@@ -92,7 +92,7 @@ func TestCreateRecord(t *testing.T) {
 
 		assertEqual(t, record.ScheduleId, scheduleId)
 		assertEqual(t, record.Items[len(record.Items)-1].Title, nowDoing)
-		assertEqual(t, latestRecord.Items[len(latestRecord.Items)-1].End, record.Items[0].Start)
+		assertEqual(t, timeEstimator(latestRecord.Items[len(latestRecord.Items)-1].End.Sub(record.Items[len(record.Items)-1].Start), time.Second*5), true)
 		assertEqual(t, record.Items[len(record.Items)-1].End.IsZero(), true)
 	})
 

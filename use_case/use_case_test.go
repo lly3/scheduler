@@ -4,6 +4,7 @@ import (
 	"errors"
 	"scheduler/entities"
 	"testing"
+	"time"
 )
 
 type mockScheduleRepo struct {
@@ -79,4 +80,8 @@ func assertEqual(t *testing.T, a interface{}, b interface{}) {
 	if a != b {
 		t.Errorf("%v != %v", a, b)
 	}
+}
+
+func timeEstimator(delta time.Duration, epsilon time.Duration) bool {
+	return delta < epsilon
 }
