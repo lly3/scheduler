@@ -59,4 +59,13 @@ func (f *FiberServer) CreateRecordRoutes() {
 		c.Status(fiber.StatusOK).SendString(remainSchedule.String())
 		return nil
 	})
+
+	recordRoutes.Get("/terminate", func(c *fiber.Ctx) error {
+
+		err := f.Uc.TerminateRecord()
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+		}
+		return nil
+	})
 }
